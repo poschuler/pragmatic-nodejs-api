@@ -8,7 +8,7 @@ export const productsRoutes = (): Router => {
 
   router.get("/", controller.getProducts);
 
-  router.post("/", controller.addProduct);
+  router.post("/", controller.createProduct);
 
   return router;
 };

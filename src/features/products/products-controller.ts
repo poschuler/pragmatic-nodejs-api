@@ -1,6 +1,15 @@
 import type { Request, Response } from "express";
+import { validateRequestWithSchema } from "../../shared/validations/validate-request-with-schema";
+import { createProductSchema } from "./schemas/create-products.schema";
 
-const products = [
+type Product = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+};
+
+const products: Product[] = [
   {
     id: 1,
     name: "Laptop",
@@ -20,7 +29,22 @@ export class ProductsController {
     res.status(200).json(products);
   };
 
-  public addProduct = async (_: Request, __: Response) => {
-    throw new Error("Not implemented");
+  public createProduct = async (req: Request, res: Response) => {
+
+    const validateResult = validateRequestWithSchema(
+      createProductSchema,
+      req,
+    );
+
+    const newProduct: Product = {
+      id: products.length + 1,
+      name: validateResult.body.name,
+      description: validateResult.body.description,
+      price: validateResult.body.price,
+    };
+
+    products.push(newProduct);
+
+    res.status(201).json(newProduct);
   };
 }
