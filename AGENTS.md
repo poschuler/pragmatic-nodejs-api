@@ -4,44 +4,78 @@ This document provides context for AI agents and human developers working on the
 
 ## 1. Project Overview
 
-A pragmatic foundation for building maintainable REST APIs with Node.js, Express, and TypeScript.
+A pragmatic foundation for building maintainable REST APIs with Node.js, Express, and TypeScript. The project follows a **Vertical Slice Architecture**, where each feature is self-contained with its own endpoints, services, domain logic, and validation.
 
 ## 2. Core Architectural Principles
 
-- **Modularity:** The application is divided into feature-based modules (e.g., `products`). Each module is self-contained, with its own routes, controllers, and (eventually) services and data access layers.
-- **Separation of Concerns (SoC):** A strict separation is maintained between different layers of the application:
-  - **Routing (`...-routes.ts`):** Defines API endpoints and maps them to controller methods.
-  - **Controllers (`...-controller.ts`):** Handles HTTP requests and responses, orchestrating business logic. It should not contain raw business logic itself.
-  - **Services (Future):** Encapsulates business logic.
-  - **Data Access Layer (Future):** Manages database interactions.
-- **Dependency Injection:** The `Server` class and routers are designed to receive dependencies (like other routers), promoting loose coupling and testability.
-- **Configuration Management:** A centralized, type-safe configuration module (`src/config`) manages environment variables, providing default values and preventing common runtime errors.
+- **Vertical Slice Architecture:** The application is organized by feature (e.g., `products`). Each feature contains all its layers: routes, endpoints, services, DTOs (request/response), mappers, and validation schemas.
+- **Separation of Concerns (SoC):** A strict separation is maintained between different layers:
+  - **Routing (`...-routes.ts`):** Defines API endpoints and maps them to endpoint handlers. Acts as a factory that receives dependencies.
+  - **Endpoints (`...-endpoint.ts`):** Handles individual HTTP operations (one file per action). Receives the service via closure injection.
+  - **Services (`...-service.ts`):** Encapsulates business logic and orchestrates domain operations.
+  - **Domain (`domain/`):** Contains entity classes with factory methods and business invariants (e.g., `Product.create()`).
+  - **DTOs:** Request (`...-request.ts`) and Response (`...-response.ts`) classes define the shape of data entering and leaving the API.
+  - **Mappers (`...-mapper.ts`):** Transform domain entities into response DTOs.
+  - **Schemas (`...-schema.ts`):** Zod schemas for request validation, colocated with their endpoint.
+  - **Data Access Layer (Future):** Repository interfaces and persistence adapters will be added in a future iteration.
+- **Dependency Injection:** The `Server` class, routers, and endpoints receive dependencies (services) via constructor or closure injection, promoting loose coupling and testability.
+- **Configuration Management:** A centralized, type-safe configuration module (`src/config`) manages environment variables using `dotenv`, providing default values and preventing common runtime errors.
+- **Global Error Handling:** A centralized `ExceptionHandlerMiddleware` catches all errors. Custom exception types (e.g., `ValidationException`) allow structured error responses.
+- **Schema Validation:** Request validation is performed using Zod schemas through a shared `validateRequestWithSchema` utility, which throws `ValidationException` on failure.
 
 ## 3. Technology Stack
 
 - **Runtime:** Node.js
-- **Framework:** Express.js
+- **Framework:** Express.js v5
 - **Language:** TypeScript
+- **Validation:** Zod v4
+- **Env Management:** dotenv
 - **Transpiler/Runner:** `tsx` for development, `tsc` for production builds.
 - **Linter/Formatter:** BiomeJS for code quality and consistent styling.
 
 ## 4. Project Structure
 
-The project follows a feature-oriented directory structure.
+The project follows a vertical-slice, feature-oriented directory structure.
 
 ```
 src/
-├── app.ts               # Main application entry point
-├── server.ts            # Core Server class (Express wrapper)
-├── routes.ts            # Main application router
+├── app.ts                          # Main application entry point
+├── server.ts                       # Core Server class (Express wrapper)
+├── routes.ts                       # Main application router & middleware composition
 │
 ├── config/
-│   └── config.ts        # Environment variable management
+│   └── config.ts                   # Environment variable management
 │
-└── features/            
-    └── products         # Example feature module
-        ├── products-controller.ts
-        └── products-routes.ts
+├── domain/
+│   └── product.entity.ts           # Product domain entity with factory method
+│
+├── exceptions/
+│   ├── validation-error.ts         # ValidationError interface
+│   └── validation-exception.ts     # ValidationException class
+│
+├── middlewares/
+│   └── exception-handler.middleware.ts  # Global error handling middleware
+│
+├── shared/
+│   └── validations/
+│       └── validate-request-with-schema.ts  # Zod schema validation utility
+│
+└── features/
+    └── products/                   # Products feature module
+        ├── products.routes.ts      # Products router factory
+        ├── products.service.ts     # Products business logic service
+        │
+        ├── create-product/         # Create Product endpoint (vertical slice)
+        │   ├── create-product.endpoint.ts
+        │   ├── create-product.mapper.ts
+        │   ├── create-product.request.ts
+        │   ├── create-product.response.ts
+        │   └── create-products.schema.ts
+        │
+        └── get-products/           # Get Products endpoint (vertical slice)
+            ├── get-products.endpoint.ts
+            ├── get-products.mapper.ts
+            └── get-products.response.ts
 ```
 
 ## 5. Development Workflow
@@ -58,12 +92,15 @@ Key scripts are defined in `package.json`:
 
 ## 6. API Style Guide
 
-- **Routing:** All API routes are prefixed with `/api`. Feature-based routes are nested (e.g., `/api/products`).
+- **Routing:** All API routes are prefixed with `/api`. Feature-based routes are nested (e.g., `/api/products`). A `/health` endpoint is available at the root.
+- **Endpoint Pattern:** Each API action has its own directory containing the endpoint handler, DTOs, mapper, and schema (one action per file).
 - **Naming Conventions:**
   - Files: `kebab-case.ts`
   - Classes: `PascalCase`
   - Functions/Variables: `camelCase`
-- **Responses:** Controllers should return JSON responses with appropriate HTTP status codes.
+  - Endpoint directories: `verb-noun/` (e.g., `create-product/`, `get-products/`)
+- **Responses:** Endpoint handlers return JSON responses with appropriate HTTP status codes (e.g., `200` for GET, `201` for POST). Error responses follow a structured format with `code`, `message`, and `errors` fields.
+- **Validation:** All incoming requests are validated against Zod schemas before reaching business logic. Validation errors return `400` with structured error details.
 
 ## 7. LLM Collaboration Model
 

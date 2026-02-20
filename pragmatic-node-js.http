@@ -1,0 +1,15 @@
+@HostAddressRoot = http://localhost:3000
+
+###
+GET {{HostAddressRoot}}/api/products
+Accept: application/json
+
+###
+POST {{HostAddressRoot}}/api/products
+Content-Type: application/json
+
+{
+    "name": "Product 1",
+    "description": "Description of Product 1",
+    "price": 9.99
+}

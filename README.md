@@ -2,14 +2,17 @@
 
 # Pragmatic Node.js API
 
-A pragmatic foundation for building maintainable REST APIs with Node.js, Express, and TypeScript.
+A pragmatic foundation for building maintainable REST APIs with Node.js, Express, and TypeScript, using **Vertical Slice Architecture**.
 
 ## ✨ Features
 
-- **Scalable Architecture:** A modular, feature-based structure that grows with your project.
+- **Vertical Slice Architecture:** Each feature is self-contained with its own endpoints, services, DTOs, mappers, and validation schemas.
+- **Domain Logic:** Rich domain entities with factory methods and business invariants.
+- **Schema Validation:** Request validation powered by Zod, with structured error responses.
+- **Global Error Handling:** Centralized exception handling middleware for consistent API error responses.
 - **TypeScript by Default:** Enjoy the benefits of static typing for more robust and maintainable code.
-- **Best Practices:** Built-in best practices for configuration management, routing, and more.
-- **Developer-Friendly:** Comes with hot-reloading for a smooth development experience.
+- **Configuration Management:** Type-safe, centralized environment variable management with dotenv.
+- **Developer-Friendly:** Hot-reloading with `tsx` for a smooth development experience.
 - **Linter & Formatter:** Integrated with BiomeJS for clean and consistent code.
 - **Ready to Deploy:** Includes scripts for building and starting a production-ready server.
 
@@ -40,6 +43,12 @@ A pragmatic foundation for building maintainable REST APIs with Node.js, Express
     npm install
     ```
 
+4. Create a `.env` file from the template:
+
+    ```bash
+    cp .env.template .env
+    ```
+
 ### Running the Application
 
 - **Development Mode:**
@@ -58,6 +67,22 @@ A pragmatic foundation for building maintainable REST APIs with Node.js, Express
     npm run start
     ```
 
+## 📡 API Endpoints
+
+| Method | Path             | Description          |
+|--------|------------------|----------------------|
+| GET    | `/health`        | Health check         |
+| GET    | `/api/products`  | List all products    |
+| POST   | `/api/products`  | Create a new product |
+
+### Example: Create a Product
+
+```bash
+curl -X POST http://localhost:3000/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Product 1", "description": "Description of Product 1", "price": 9.99}'
+```
+
 ## 📜 Available Scripts
 
 - `npm run dev`: Starts the application in development mode with hot-reloading.
@@ -70,28 +95,56 @@ A pragmatic foundation for building maintainable REST APIs with Node.js, Express
 
 ## 🏗️ Project Structure
 
-The project follows a feature-oriented directory structure, making it easy to navigate and scale.
+The project follows a vertical-slice, feature-oriented directory structure.
 
 ```
 src/
-├── app.ts               # Main application entry point
-├── server.ts            # Core Server class (Express wrapper)
-├── routes.ts            # Main application router
+├── app.ts                          # Main application entry point
+├── server.ts                       # Core Server class (Express wrapper)
+├── routes.ts                       # Main application router & middleware composition
 │
 ├── config/
-│   └── config.ts        # Environment variable management
+│   └── config.ts                   # Environment variable management
 │
-└── features/            # Example feature module
-    └── products
-        ├── products-controller.ts
-        └── products-routes.ts
+├── domain/
+│   └── product.entity.ts           # Product domain entity with factory method
+│
+├── exceptions/
+│   ├── validation-error.ts         # ValidationError interface
+│   └── validation-exception.ts     # ValidationException class
+│
+├── middlewares/
+│   └── exception-handler.middleware.ts  # Global error handling middleware
+│
+├── shared/
+│   └── validations/
+│       └── validate-request-with-schema.ts  # Zod schema validation utility
+│
+└── features/
+    └── products/                   # Products feature module
+        ├── products.routes.ts      # Products router factory
+        ├── products.service.ts     # Products business logic service
+        │
+        ├── create-product/         # Create Product endpoint (vertical slice)
+        │   ├── create-product.endpoint.ts
+        │   ├── create-product.mapper.ts
+        │   ├── create-product.request.ts
+        │   ├── create-product.response.ts
+        │   └── create-products.schema.ts
+        │
+        └── get-products/           # Get Products endpoint (vertical slice)
+            ├── get-products.endpoint.ts
+            ├── get-products.mapper.ts
+            └── get-products.response.ts
 ```
 
 ## 🛠️ Technology Stack
 
 - **Runtime:** [Node.js](https://nodejs.org/)
-- **Framework:** [Express.js](https://expressjs.com/)
+- **Framework:** [Express.js v5](https://expressjs.com/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Validation:** [Zod](https://zod.dev/)
+- **Env Management:** [dotenv](https://github.com/motdotla/dotenv)
 - **Transpiler/Runner:** [tsx](https://github.com/esbuild-kit/tsx)
 - **Linter/Formatter:** [BiomeJS](https://biomejs.dev/)
 
