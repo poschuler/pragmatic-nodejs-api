@@ -1,6 +1,6 @@
 import type { ZodType } from "zod";
 import type { Request } from "express";
-import { ValidationException } from "../../exceptions/validation-exception";
+import { ValidationException } from "../../exceptions/validation-exception.js";
 
 export const validateRequestWithSchema = <T>(
   schema: ZodType<T>,

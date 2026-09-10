@@ -1,5 +1,5 @@
-import type { Product } from "../../../domain/product.entity";
-import { GetProductsResponse } from "./get-products.response";
+import type { Product } from "../../../domain/product.entity.js";
+import { GetProductsResponse } from "./get-products.response.js";
 
 //biome-ignore lint: allow only static methods
 export class GetProductsMapper {

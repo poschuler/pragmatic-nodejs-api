@@ -21,7 +21,7 @@ A pragmatic foundation for building maintainable REST APIs with Node.js, Express
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/en/) (v24 or higher)
-- [npm](https://www.npmjs.com/)
+- [pnpm](https://pnpm.io/) (v11 or higher). If you have Node.js 24+, enable it with `corepack enable`.
 
 ### Installation
 
@@ -40,14 +40,23 @@ A pragmatic foundation for building maintainable REST APIs with Node.js, Express
 3. Install the dependencies:
 
     ```bash
-    npm install
+    pnpm install
     ```
 
-4. Create a `.env` file from the template:
+4. Create your environment file from the template:
 
     ```bash
     cp .env.template .env
     ```
+
+    | Variable | Default | Description |
+    | --- | --- | --- |
+    | `PORT` | `3000` | Port the HTTP server listens on. |
+    | `NODE_ENV` | `development` | Current environment name. |
+    | `DEBUG` | `false` | Enables verbose output. |
+
+    All three have defaults, so the app boots without a `.env` file, but the
+    values are validated and parsed at startup by `src/config/config.ts`.
 
 ### Running the Application
 
@@ -55,7 +64,7 @@ A pragmatic foundation for building maintainable REST APIs with Node.js, Express
     To start the server in development mode with hot-reloading, run:
 
     ```bash
-    npm run dev
+    pnpm dev
     ```
 
     The server will be available at `http://localhost:3000`.
@@ -64,7 +73,7 @@ A pragmatic foundation for building maintainable REST APIs with Node.js, Express
     To build and start the application in production mode, run:
 
     ```bash
-    npm run start
+    pnpm start
     ```
 
 ## 📡 API Endpoints
@@ -85,13 +94,16 @@ curl -X POST http://localhost:3000/api/products \
 
 ## 📜 Available Scripts
 
-- `npm run dev`: Starts the application in development mode with hot-reloading.
-- `npm run build`: Compiles the TypeScript code to JavaScript in the `dist` directory.
-- `npm run start`: Builds and starts the production version of the application.
-- `npm run biome:lint`: Lints the codebase for errors.
-- `npm run biome:lint:fix`: Lints and fixes the codebase.
-- `npm run biome:format`: Formats the codebase.
-- `npm run biome:format:fix`: Formats and writes the changes to the codebase.
+- `pnpm dev`: Starts the application in development mode with hot-reloading.
+- `pnpm build`: Compiles the TypeScript code to JavaScript in the `dist` directory.
+- `pnpm start`: Builds and starts the production version of the application.
+- `pnpm biome:lint`: Lints the codebase for errors.
+- `pnpm biome:lint:fix`: Lints and fixes the codebase.
+- `pnpm biome:format`: Formats the codebase.
+- `pnpm biome:format:fix`: Formats and writes the changes to the codebase.
+
+> A `preinstall` guard (`only-allow pnpm`) runs automatically and aborts the
+> install if you try to use `npm` or `yarn`.
 
 ## 🏗️ Project Structure
 
@@ -143,10 +155,12 @@ src/
 - **Runtime:** [Node.js](https://nodejs.org/)
 - **Framework:** [Express.js v5](https://expressjs.com/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Module System:** ESM (`"type": "module"`)
 - **Validation:** [Zod](https://zod.dev/)
 - **Env Management:** [dotenv](https://github.com/motdotla/dotenv)
 - **Transpiler/Runner:** [tsx](https://github.com/esbuild-kit/tsx)
 - **Linter/Formatter:** [BiomeJS](https://biomejs.dev/)
+- **Package Manager:** [pnpm](https://pnpm.io/) (pinned via the `packageManager` field in `package.json`)
 
 ## 🤝 Contributing
 

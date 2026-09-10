@@ -28,10 +28,12 @@ A pragmatic foundation for building maintainable REST APIs with Node.js, Express
 - **Runtime:** Node.js
 - **Framework:** Express.js v5
 - **Language:** TypeScript
+- **Module System:** ESM (`"type": "module"` in `package.json`). Relative imports **must** carry the `.js` extension (e.g. `import { appRoutes } from "./routes.js"`), even though the source file is `.ts`.
 - **Validation:** Zod v4
 - **Env Management:** dotenv
 - **Transpiler/Runner:** `tsx` for development, `tsc` for production builds.
 - **Linter/Formatter:** BiomeJS for code quality and consistent styling.
+- **Package Manager:** `pnpm` (exclusively). The version is pinned via the `packageManager` field in `package.json`.
 
 ## 4. Project Structure
 
@@ -80,15 +82,19 @@ src/
 
 ## 5. Development Workflow
 
+**Package manager:** this project uses `pnpm` exclusively. Never run `npm` or `yarn` commands here — they would generate a competing lockfile. Use `pnpm add` / `pnpm add -D` to install packages, `pnpm dlx` instead of `npx`, and `pnpm install --frozen-lockfile` in CI. Only `pnpm-lock.yaml` is committed. Dependency build scripts are governed by `pnpm-workspace.yaml` (`allowBuilds`), since pnpm does not run them by default. A `preinstall` guard (`only-allow pnpm`) enforces this automatically and aborts any `npm`/`yarn` install. That guard is the one deliberate exception to the `pnpm dlx` rule: it is invoked as `npx only-allow pnpm` on purpose, because it must run under whichever package manager the user actually typed. Do not rewrite it to `pnpm dlx`.
+
+**Environment:** runtime configuration comes from a `.env` file, created from `.env.template` (`PORT`, `NODE_ENV`, `DEBUG`). Every variable has a default and is parsed/validated in `src/config/config.ts`; `.env` is git-ignored and must never be committed.
+
 Key scripts are defined in `package.json`:
 
-- `npm run dev`: Starts the application in development mode with hot-reloading using `tsx`.
-- `npm run build`: Compiles the TypeScript code into JavaScript in the `dist` directory.
-- `npm run start`: Builds and starts the production version of the application.
-- `npm run biome:lint`: Lints the codebase for errors.
-- `npm run biome:lint:fix`: Lints and fixes the codebase.
-- `npm run biome:format`: Formats the codebase.
-- `npm run biome:format:fix`: Formats and writes the changes to the codebase.
+- `pnpm dev`: Starts the application in development mode with hot-reloading using `tsx`.
+- `pnpm build`: Compiles the TypeScript code into JavaScript in the `dist` directory.
+- `pnpm start`: Builds and starts the production version of the application.
+- `pnpm biome:lint`: Lints the codebase for errors.
+- `pnpm biome:lint:fix`: Lints and fixes the codebase.
+- `pnpm biome:format`: Formats the codebase.
+- `pnpm biome:format:fix`: Formats and writes the changes to the codebase.
 
 ## 6. API Style Guide
 
@@ -98,6 +104,7 @@ Key scripts are defined in `package.json`:
   - Files: `kebab-case.ts`
   - Classes: `PascalCase`
   - Functions/Variables: `camelCase`
+- **Imports:** Relative imports must end in `.js` (ESM requirement), and import ordering is handled automatically by Biome (`organizeImports`).
   - Endpoint directories: `verb-noun/` (e.g., `create-product/`, `get-products/`)
 - **Responses:** Endpoint handlers return JSON responses with appropriate HTTP status codes (e.g., `200` for GET, `201` for POST). Error responses follow a structured format with `code`, `message`, and `errors` fields.
 - **Validation:** All incoming requests are validated against Zod schemas before reaching business logic. Validation errors return `400` with structured error details.

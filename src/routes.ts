@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
-import { productsRoutes } from "./features/products/products.routes";
-import { ExceptionHandlerMiddleware } from "./middlewares/exception-handler.middleware";
+import { ExceptionHandlerMiddleware } from "./middlewares/exception-handler.middleware.js";
+import { productsRoutes } from "./features/products/products.routes.js";
 
 export const appRoutes = (): Router => {
   const router = Router();

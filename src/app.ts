@@ -1,6 +1,6 @@
-import { config } from "./config/config";
-import { appRoutes } from "./routes";
-import { Server } from "./server";
+import { config } from "./config/config.js";
+import { appRoutes } from "./routes.js";
+import { Server } from "./server.js";
 
 async function main() {
   const server = new Server({

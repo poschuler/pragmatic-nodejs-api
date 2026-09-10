@@ -1,5 +1,5 @@
-import { Product } from "../../domain/product.entity";
-import type { CreateProductRequest } from "./create-product/create-product.request";
+import { Product } from "../../domain/product.entity.js";
+import type { CreateProductRequest } from "./create-product/create-product.request.js";
 
 export class ProductsService {
     private products: Product[] = [

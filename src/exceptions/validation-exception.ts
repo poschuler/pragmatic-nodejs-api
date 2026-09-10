@@ -1,4 +1,4 @@
-import type { ValidationError } from "./validation-error";
+import type { ValidationError } from "./validation-error.js";
 
 export class ValidationException extends Error {
   public readonly errors: ValidationError[];

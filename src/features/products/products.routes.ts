@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { ProductsService } from './products.service';
-import { getProducts } from "./get-products/get-products.endpoint";
-import { createProduct } from "./create-product/create-product.endpoint";
+import { ProductsService } from './products.service.js';
+import { getProducts } from "./get-products/get-products.endpoint.js";
+import { createProduct } from "./create-product/create-product.endpoint.js";
 
 
 export const productsRoutes = (): Router => {

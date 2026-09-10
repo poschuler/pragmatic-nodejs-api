@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { ValidationException } from "../exceptions/validation-exception";
+import { ValidationException } from "../exceptions/validation-exception.js";
 
 export class ExceptionHandlerMiddleware {
   public handle = async (
